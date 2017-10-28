@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly
 import plotly.graph_objs as go
+from os import walk
 
 
 def plotly_plot(plotly_data, ipf_plotly):
@@ -31,11 +32,11 @@ def plotly_plot(plotly_data, ipf_plotly):
     datap = [trace1, trace2, trace3]
     layout = go.Layout(
         title='Battery log output',
-        width=1920,
-        height=1080,
+        width=1600,
+        height=900,
         font=dict(size=18),
         xaxis=dict(
-            domain=[0.2, 0.9]
+            domain=[0.25, 1]
         ),
         yaxis=dict(
             title='Voltage (mV)',
@@ -107,7 +108,17 @@ def mpl_plot(mpl_data):
     plt.grid()
     plt.show()
 
-file_name = '2017-10-12.csv'
-data = pd.read_csv('csv_files/'+str(file_name))
-data.set_index(pd.to_datetime(data['Datetime']), inplace=True)
-plotly_plot(data, file_name)
+folder = "C:/Users/BADRINAR/Google Drive/Misc"
+data_dict = {'Datetime': ['2017-10-10 22:27:00'], 'Status': ['Discharging'], 'Health': ['Good'], 'Level': [87],
+             'Scale': [100], 'Plugged': ['None'], 'Voltage': [4183], 'Temperature': [34.1]}
+data = pd.DataFrame(data_dict, index=data_dict['Datetime'])
+# data.set_index(pd.to_datetime(data['Datetime']), inplace=True)
+print('Reading data ... ')
+for dirpath, dirname, filenames in walk(folder):
+    for filename in filenames:
+        df = pd.read_csv(dirpath + '/' + filename)
+        df.set_index(pd.to_datetime(df['Datetime']), inplace=True)
+        df = df.iloc[::-1]
+        data = data.append(df)
+plotly_plot(data, 'fig.html')
+print('Plotting data ... ')
